@@ -1,0 +1,22 @@
+[package]
+name = "hyprgrid"
+version = "0.1.0"
+edition = "2021"
+authors = ["Your Name <your.email@example.com>"]
+description = "A keyboard-driven mouse controller for Hyprland"
+license = "MIT"
+repository = "https://github.com/gabesan21/HyprGrid"
+
+[dependencies]
+# GUI framework (using iced for cross-platform GUI)
+iced = "0.13"
+
+# Configuration parsing
+serde = { version = "1.0", features = ["derive"] }
+toml = "0.8"
+
+# Hyprland IPC
+hyprland = "0.4"
+
+# Error handling
+anyhow = "1.0"
