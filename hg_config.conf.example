@@ -1,0 +1,21 @@
+# HyprGrid Configuration File (Example)
+# Copy this file to: ~/.config/hypr/hg_config.conf
+#
+# This file defines the grid overlay dimensions for the HyprGrid
+# keyboard-driven mouse controller.
+#
+# NOTE: Monitors are auto-detected from Hyprland at runtime.
+# You do NOT need to configure monitors manually.
+
+# Grid dimensions (for landscape orientation)
+# - These values will be used as-is for landscape monitors (width > height)
+# - For portrait monitors (width < height), rows and cols will be swapped automatically
+grid_rows = 10
+grid_cols = 20
+
+# Recommended values:
+# - grid_rows: 5-20 (reasonable range: 2-50)
+# - grid_cols: 10-30 (reasonable range: 2-50)
+#
+# The grid will appear only on the currently focused monitor.
+# Monitor information is detected automatically via 'hyprctl monitors -j'.

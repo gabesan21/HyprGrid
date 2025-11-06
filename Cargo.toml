@@ -8,15 +8,17 @@ license = "MIT"
 repository = "https://github.com/gabesan21/HyprGrid"
 
 [dependencies]
-# GUI framework (using iced for cross-platform GUI)
+# GUI framework - iced works with Wayland via winit
 iced = "0.13"
+
+# Wayland client libraries
+wayland-client = "0.31"
+wayland-protocols = "0.31"
 
 # Configuration parsing
 serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
 toml = "0.8"
-
-# Hyprland IPC
-hyprland = "0.4"
 
 # Error handling
 anyhow = "1.0"
