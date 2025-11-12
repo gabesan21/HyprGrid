@@ -1,0 +1,281 @@
+;; ============================================================================
+;; Kanata Configuration - Home Row Mods + Vim Navigation
+;; ============================================================================
+;;
+;; ⚠️  IMPORTANT: Before using this config, you MUST update the keyboard device
+;; path on line 29 to match YOUR keyboard!
+;;
+;; Find your keyboard with: ls -l /dev/input/by-id/ | grep kbd
+;; Then update the 'linux-dev' line in the defcfg section below.
+;;
+;; ============================================================================
+;;
+;; This configuration provides:
+;; - GACS home row mods layout (optimized for Linux/Hyprland)
+;; - 2-layer toggle system: base ↔ nav
+;; - Navigation layer with Vim-style arrow keys (h/j/k/l)
+;; - Physical Super keys (lmet/rmet) toggle between base and nav layers
+;; - Caps Lock as Escape (tap) / Caps Lock toggle (hold)
+;;
+;; Layout Philosophy: Modified GACS
+;; Left hand:  A=LeftAlt, S=Shift, D=Ctrl, F=Super
+;; Right hand: J=Super, K=Ctrl, L=Shift, ;=LeftAlt, .=RightAlt
+;;
+;; ============================================================================
+
+(defcfg
+  ;; Specify which keyboard to intercept
+  ;; Find your device: ls -l /dev/input/by-path/ | grep kbd
+  ;; Or use: ls -l /dev/input/by-id/
+  ;;
+  ;; IMPORTANT: Update this line with YOUR keyboard device path!
+  ;; Common options (check which one exists on your system):
+  ;;
+  ;; For built-in laptop keyboards:
+  ;; linux-dev /dev/input/by-path/platform-i8042-serio-0-event-kbd
+  ;;
+  ;; For USB keyboards (use ls -l /dev/input/by-id/ | grep kbd to find yours):
+  linux-dev /dev/input/by-id/usb-SONiX_Satechi_Compact_Keyboard-event-kbd
+  ;;
+  ;; For multiple keyboards, you can specify multiple devices:
+  ;; linux-dev (
+  ;;   /dev/input/by-id/usb-Keyboard_1-event-kbd
+  ;;   /dev/input/by-id/usb-Keyboard_2-event-kbd
+  ;; )
+
+  ;; Process keys not explicitly remapped
+  process-unmapped-keys yes
+)
+
+;; ============================================================================
+;; SOURCE LAYER - Define physical keys we're remapping
+;; ============================================================================
+;; Only include keys we're actually modifying to keep the config clean
+
+(defsrc
+  caps       ;; Caps Lock
+  lmet rmet  ;; Physical Super keys (now layer toggles!)
+  a  s  d  f  ;; Left home row
+  h  j  k  l  ;; Right home row (note: h added for vim nav)
+  ;  .        ;; Semicolon and period
+  lsft rsft  ;; Physical Shift keys (DISABLED - use home row mods!)
+  lalt ralt  ;; Physical Alt keys (DISABLED - use home row mods!)
+  lctl rctl  ;; Physical Ctrl keys (DISABLED - use home row mods!)
+)
+
+;; ============================================================================
+;; TIMING VARIABLES
+;; ============================================================================
+;; Adjust these values to tune the behavior to your typing speed
+
+(defvar
+  ;; Tap-hold timings for home row mods
+  tap-time 150     ;; How quickly to resolve as a tap (ms)
+  hold-time 200    ;; How long to hold before activating modifier (ms)
+)
+
+;; ============================================================================
+;; BASE LAYER - Main layer active during normal typing
+;; ============================================================================
+
+(deflayer base
+  @escctrl        ;; Caps Lock → Escape/Control
+  @toNav @toNav   ;; Physical Super keys → Toggle to nav layer
+  @a  @s  @d  @f  ;; Left home row mods
+  h   @j  @k  @l  ;; Right home row mods (h is just 'h' in base layer)
+  @;  @.          ;; Semicolon and period
+  _   _           ;; Physical Shift keys DISABLED
+  _   _           ;; Physical Alt keys DISABLED
+  _   _           ;; Physical Ctrl keys DISABLED
+)
+
+;; ============================================================================
+;; NAVIGATION LAYER - Vim-style arrow keys on h/j/k/l
+;; ============================================================================
+;; Press physical Super key to toggle here, press again to go back to base
+
+(deflayer nav
+  @escctrl        ;; Caps Lock still works as Esc/Control
+  @toBase @toBase ;; Physical Super keys → Toggle back to base layer
+  @a  @s  @d  @f  ;; Home row mods still work!
+  left down up rght ;; h/j/k/l become arrow keys (Vim-style!)
+  @;  @.          ;; Semicolon and period
+  _   _           ;; Physical Shift keys DISABLED
+  _   _           ;; Physical Alt keys DISABLED
+  _   _           ;; Physical Ctrl keys DISABLED
+)
+
+;; ============================================================================
+;; ALIASES - Define special key behaviors
+;; ============================================================================
+
+(defalias
+  ;; -------------------------------------------------------------------------
+  ;; Layer Switching - Tap to toggle between base and nav layers
+  ;; -------------------------------------------------------------------------
+  ;; Physical Super keys (lmet/rmet) now toggle between layers
+  ;; This frees up your Super keys since F and J act as Super via home row mods
+  ;; Toggle: base ↔ nav
+  toNav (layer-switch nav)       ;; Switch to navigation layer
+  toBase (layer-switch base)     ;; Switch back to base layer
+
+  ;; -------------------------------------------------------------------------
+  ;; Caps Lock: Tap for Escape, Hold to toggle Caps Lock
+  ;; -------------------------------------------------------------------------
+  ;; Perfect for Vim users! Quick tap gives Esc, hold toggles Caps Lock on/off
+  escctrl (tap-hold 100 100 esc caps)
+
+  ;; -------------------------------------------------------------------------
+  ;; LEFT HAND - Home Row Mods (GACS layout)
+  ;; -------------------------------------------------------------------------
+
+  ;; 'A' key - Left Alt modifier
+  ;; - Tap: types 'a'
+  ;; - Hold: Left Alt
+  a (tap-hold $tap-time $hold-time a lalt)
+
+  ;; 'S' key - Shift modifier
+  ;; - Tap: types 's'
+  ;; - Hold: Left Shift
+  s (tap-hold $tap-time $hold-time s lsft)
+
+  ;; 'D' key - Control modifier
+  ;; - Tap: types 'd'
+  ;; - Hold: Left Control
+  d (tap-hold $tap-time $hold-time d lctl)
+
+  ;; 'F' key - Super/Meta modifier (Windows/Command key)
+  ;; - Tap: types 'f'
+  ;; - Hold: Left Super (for Hyprland shortcuts!)
+  f (tap-hold $tap-time $hold-time f lmet)
+
+  ;; -------------------------------------------------------------------------
+  ;; RIGHT HAND - Home Row Mods (mirrored)
+  ;; -------------------------------------------------------------------------
+
+  ;; 'J' key - Super/Meta modifier
+  ;; - Tap: types 'j'
+  ;; - Hold: Right Super
+  j (tap-hold $tap-time $hold-time j rmet)
+
+  ;; 'K' key - Control modifier
+  ;; - Tap: types 'k'
+  ;; - Hold: Right Control
+  k (tap-hold $tap-time $hold-time k rctl)
+
+  ;; 'L' key - Shift modifier
+  ;; - Tap: types 'l'
+  ;; - Hold: Right Shift
+  l (tap-hold $tap-time $hold-time l rsft)
+
+  ;; ';' key - Left Alt modifier
+  ;; - Tap: types ';'
+  ;; - Hold: Left Alt
+  ; (tap-hold $tap-time $hold-time ; lalt)
+
+  ;; '.' key - Right Alt modifier
+  ;; - Tap: types '.'
+  ;; - Hold: Right Alt
+  . (tap-hold $tap-time $hold-time . ralt)
+)
+
+;; ============================================================================
+;; USAGE EXAMPLES
+;; ============================================================================
+;;
+;; Layer Toggling with Physical Super Key:
+;; ----------------------------------------
+;; The physical Super keys (left/right Windows keys) toggle between 2 layers:
+;;
+;;   base ↔ nav
+;;
+;; 1. Tap Super (from base):
+;;    → Enters navigation layer (Vim arrow keys)
+;;
+;; 2. Tap Super again (from nav):
+;;    → Returns to base layer
+;;
+;;
+;; Navigation Layer (Vim Arrow Keys):
+;; -----------------------------------
+;; When in nav layer (tap Super from base):
+;;
+;; Vim-style navigation on home row:
+;;   → 'H' = Left arrow ←
+;;   → 'J' = Down arrow ↓
+;;   → 'K' = Up arrow ↑
+;;   → 'L' = Right arrow →
+;;
+;; Home row mods still work in nav layer!
+;;   → Hold 'D' + tap 'L' = Ctrl+Right (jump word in terminal)
+;;   → Hold 'S' + tap 'K' = Shift+Up (select line up)
+;;   → Hold 'F' + tap 'H' = Super+Left (move window left in Hyprland)
+;;
+;; To return to base layer:
+;;   → Tap physical Super key again
+;;
+;;
+;; Home Row Mods Examples:
+;; -----------------------
+;; Super+T (e.g., open terminal in Hyprland):
+;;   → Hold 'F' + tap 'T'
+;;
+;; Ctrl+C (copy):
+;;   → Hold 'D' + tap 'C'
+;;
+;; Alt+Tab (switch windows):
+;;   → Hold 'A' + tap 'Tab'
+;;
+;; Shift+A (capital A):
+;;   → Hold 'S' + tap 'A'
+;;
+;; Ctrl+Shift+Esc (task manager):
+;;   → Hold 'D' + Hold 'S' + tap 'Esc'
+;;
+;;
+;; Caps Lock / Escape / Toggle:
+;; ----------------------------
+;; Exit Vim insert mode:
+;;   → Quick tap on Caps Lock (sends Esc)
+;;
+;; Toggle Caps Lock on/off:
+;;   → Hold Caps Lock (activates/deactivates Caps Lock)
+;;   → Useful when you need to TYPE IN ALL CAPS
+;;
+;; ============================================================================
+;; CUSTOMIZATION TIPS
+;; ============================================================================
+;;
+;; 1. Adjust timing for your typing speed:
+;;    - If you get accidental modifiers → increase $hold-time (try 250)
+;;    - If modifiers feel slow → decrease $hold-time (try 180)
+;;
+;; 2. Find your keyboard device:
+;;    ls -l /dev/input/by-path/ | grep kbd
+;;    Update the 'linux-dev' line in defcfg
+;;
+;; 3. Validate config for syntax errors:
+;;    sudo kanata --cfg /path/to/kanata.kbd --check
+;;
+;; 4. Test before enabling systemd service:
+;;    sudo kanata --cfg /path/to/kanata.kbd
+;;    (Press Ctrl+C to stop)
+;;
+;; ============================================================================
+;; TROUBLESHOOTING
+;; ============================================================================
+;;
+;; Problem: Kanata won't start
+;; Solution: Check device path and logs (sudo journalctl -u kanata.service -f)
+;;
+;; Problem: Too many accidental modifiers when typing fast
+;; Solution: Increase $hold-time from 200 to 250 or 300
+;;
+;; Problem: Some keys aren't working
+;; Solution: This config only remaps specific keys. All other keys pass through
+;;           unchanged. Check that process-unmapped-keys is set to 'yes'
+;;
+;; ============================================================================
+
+;; End of configuration
+;; For more information: https://github.com/jtroo/kanata

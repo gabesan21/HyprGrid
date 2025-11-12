@@ -1,0 +1,69 @@
+# HyprGrid - Hyprland Configuration Example
+#
+# Add these lines to your ~/.config/hypr/hyprland.conf to enable HyprGrid
+
+# ============================================================================
+# Keybind to summon HyprGrid
+# ============================================================================
+# This assumes the compiled binary is named 'hyprgrid' and is in ~/.config/hypr/
+# Keybind: SUPER + CTRL + G
+bind = $mainMod CTRL, G, exec, ~/.config/hypr/hyprgrid
+
+# Alternative keybind examples:
+# bind = $mainMod, S, exec, ~/.config/hypr/hyprgrid              # SUPER + S
+# bind = $mainMod SHIFT, G, exec, ~/.config/hypr/hyprgrid        # SUPER + SHIFT + G
+# bind = ALT, G, exec, ~/.config/hypr/hyprgrid                   # ALT + G
+
+# ============================================================================
+# Window Rules to make HyprGrid a proper overlay
+# ============================================================================
+# These rules target the window by its initialTitle "HyprGrid"
+# They ensure the grid appears as a fullscreen, transparent overlay
+
+# Make the window float (not tiled)
+windowrulev2 = float, initialTitle:^(HyprGrid)$
+
+# Set the window to fullscreen mode
+windowrulev2 = fullscreen, initialTitle:^(HyprGrid)$
+
+# Remove window borders
+windowrulev2 = noborder, initialTitle:^(HyprGrid)$
+
+# Remove drop shadows
+windowrulev2 = noshadow, initialTitle:^(HyprGrid)$
+
+# Disable blur effects (important for performance)
+# Without this, Hyprland will attempt to blur the entire fullscreen overlay
+# which is wasteful and can cause performance issues
+windowrulev2 = noblur, initialTitle:^(HyprGrid)$
+
+# Set window opacity (0.0 = fully transparent, 1.0 = fully opaque)
+# 0.8 provides good visibility while allowing the desktop to show through
+windowrulev2 = opacity 0.8, initialTitle:^(HyprGrid)$
+
+# ============================================================================
+# Optional: Additional window rules you might want to consider
+# ============================================================================
+
+# Pin to all workspaces (if you want the grid to appear regardless of workspace)
+# windowrulev2 = pin, initialTitle:^(HyprGrid)$
+
+# Disable animations for instant appearance/disappearance
+# windowrulev2 = noanim, initialTitle:^(HyprGrid)$
+
+# Focus the window immediately when it appears
+# windowrulev2 = stayfocused, initialTitle:^(HyprGrid)$
+
+# ============================================================================
+# Notes
+# ============================================================================
+#
+# After adding these configurations:
+# 1. Save your hyprland.conf file
+# 2. Reload Hyprland config: hyprctl reload
+#    OR restart Hyprland
+#
+# To test if the binary path is correct:
+#   ~/.config/hypr/hyprgrid
+#
+# The Grid awaits. End of line.

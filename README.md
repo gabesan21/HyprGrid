@@ -79,14 +79,15 @@ height = 1080
 Add these lines to your `~/.config/hypr/hyprland.conf`:
 
 ```hyprlang
-# Keybind to summon HyprGrid (SUPER + S in this example)
-bind = $mainMod, S, exec, ~/.config/hypr/hyprgrid
+# Keybind to summon HyprGrid (SUPER + CTRL + G)
+bind = $mainMod CTRL, G, exec, ~/.config/hypr/hyprgrid
 
 # Window rules to make HyprGrid a proper overlay
 windowrulev2 = float, initialTitle:^(HyprGrid)$
 windowrulev2 = fullscreen, initialTitle:^(HyprGrid)$
 windowrulev2 = noborder, initialTitle:^(HyprGrid)$
 windowrulev2 = noshadow, initialTitle:^(HyprGrid)$
+windowrulev2 = noblur, initialTitle:^(HyprGrid)$
 windowrulev2 = opacity 0.8, initialTitle:^(HyprGrid)$
 ```
 
@@ -94,7 +95,7 @@ Reload your Hyprland configuration or restart Hyprland.
 
 ## Usage
 
-1. **Summon the Grid:** Press your configured hotkey (e.g., `SUPER + S`)
+1. **Summon the Grid:** Press your configured hotkey (e.g., `SUPER + CTRL + G`)
 2. **Select Your Target:** The grid appears with letter-pair labels. Type the two letters corresponding to your target cell (e.g., `aj`)
 3. **Execute Action:**
    - Press `SPACE` for a **left click**
@@ -132,6 +133,16 @@ No daemons, no servers, no persistent state. Just instant execution.
 - Run `hyprctl monitors` to see your monitor names and resolutions
 - Update your `hg_config.conf` with the correct values
 - Ensure monitor names match exactly
+
+## Optional: Advanced Keyboard Configuration
+
+For users who want to take their keyboard-driven workflow to the next level, we provide an optional **Kanata** configuration that enables:
+
+- **Home Row Mods** - Use ASDF/JKL; as modifiers (Alt/Shift/Ctrl/Super) when held, normal letters when tapped
+- **Multi-Layer Support** - QMK-style layers for navigation, symbols, numbers, etc.
+- **Portuguese Accents** - Double-tap vowels for á, é, í, ó, ú, ç without switching layouts
+
+This is completely optional and independent from HyprGrid itself. See **[kanata/README.md](kanata/README.md)** for full documentation and setup instructions.
 
 ## Contributing
 

@@ -16,6 +16,16 @@ grid_cols = 20
 # Recommended values:
 # - grid_rows: 5-20 (reasonable range: 2-50)
 # - grid_cols: 10-30 (reasonable range: 2-50)
-#
+
+# Border settings (optional - defaults shown below)
+# Whether to draw borders between grid cells
+border_enabled = true
+
+# Color of the grid cell borders (hex format: #RRGGBB or #RGB)
+border_color = "#FFFFFF"
+
+# Width of the grid cell borders in pixels (0-10)
+border_width = 1
+
 # The grid will appear only on the currently focused monitor.
 # Monitor information is detected automatically via 'hyprctl monitors -j'.

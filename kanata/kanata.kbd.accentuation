@@ -1,0 +1,478 @@
+;; ============================================================================
+;; Kanata Configuration - Home Row Mods + Portuguese Accents
+;; ============================================================================
+;;
+;; ⚠️  IMPORTANT: Before using this config, you MUST update the keyboard device
+;; path on line 29 to match YOUR keyboard!
+;;
+;; Find your keyboard with: ls -l /dev/input/by-id/ | grep kbd
+;; Then update the 'linux-dev' line in the defcfg section below.
+;;
+;; ============================================================================
+;;
+;; This configuration provides:
+;; - GACS home row mods layout (optimized for Linux/Hyprland)
+;; - 3-layer cycling system: base → nav → accents → base
+;; - Portuguese accents layer with direct character access (works in terminals!)
+;; - Navigation layer with Vim-style arrow keys (h/j/k/l)
+;; - Physical Super keys (lmet/rmet) cycle through layers
+;; - Caps Lock as Escape (tap) / Caps Lock toggle (hold)
+;; - Optional compose key support (deprecated in favor of accents layer)
+;;
+;; Layout Philosophy: Modified GACS
+;; Left hand:  A=LeftAlt, S=Shift, D=Ctrl, F=Super
+;; Right hand: J=Super, K=Ctrl, L=Shift, ;=LeftAlt, .=RightAlt
+;;
+;; Portuguese Accents (Accents Layer - tap Super twice from base):
+;; Vowel E: e→é, r→ê
+;; Vowel I: i→í
+;; Vowel U: u→ú
+;; Vowel O: o→ó, p→õ, [→ô
+;; Vowel A: a→á, s→ã, d→â, f→à
+;; Cedilha: c→ç
+;; (Hold L [Shift] for uppercase: á→Á, ç→Ç, etc.)
+;;
+;; ============================================================================
+
+(defcfg
+  ;; Specify which keyboard to intercept
+  ;; Find your device: ls -l /dev/input/by-path/ | grep kbd
+  ;; Or use: ls -l /dev/input/by-id/
+  ;;
+  ;; IMPORTANT: Update this line with YOUR keyboard device path!
+  ;; Common options (check which one exists on your system):
+  ;;
+  ;; For built-in laptop keyboards:
+  ;; linux-dev /dev/input/by-path/platform-i8042-serio-0-event-kbd
+  ;;
+  ;; For USB keyboards (use ls -l /dev/input/by-id/ | grep kbd to find yours):
+  linux-dev /dev/input/by-id/usb-SONiX_Satechi_Compact_Keyboard-event-kbd
+  ;;
+  ;; For multiple keyboards, you can specify multiple devices:
+  ;; linux-dev (
+  ;;   /dev/input/by-id/usb-Keyboard_1-event-kbd
+  ;;   /dev/input/by-id/usb-Keyboard_2-event-kbd
+  ;; )
+
+  ;; Process keys not explicitly remapped
+  process-unmapped-keys yes
+)
+
+;; ============================================================================
+;; SOURCE LAYER - Define physical keys we're remapping
+;; ============================================================================
+;; Only include keys we're actually modifying to keep the config clean
+
+(defsrc
+  caps       ;; Caps Lock
+  lmet rmet  ;; Physical Super keys (now layer toggles!)
+  a  s  d  f  ;; Left home row
+  h  j  k  l  ;; Right home row (note: h added for vim nav)
+  ;  .        ;; Semicolon and period
+  e  r       ;; For é, ê
+  i  u       ;; For í, ú
+  o  p  [    ;; For ó, õ, ô
+  c          ;; For ç
+  lsft rsft  ;; Physical Shift keys (DISABLED - use home row mods!)
+  lalt ralt  ;; Physical Alt keys (DISABLED - use home row mods!)
+  lctl rctl  ;; Physical Ctrl keys (DISABLED - use home row mods!)
+)
+
+;; ============================================================================
+;; TIMING VARIABLES
+;; ============================================================================
+;; Adjust these values to tune the behavior to your typing speed
+
+(defvar
+  ;; Tap-hold timings for home row mods
+  tap-time 150     ;; How quickly to resolve as a tap (ms)
+  hold-time 200    ;; How long to hold before activating modifier (ms)
+)
+
+;; ============================================================================
+;; BASE LAYER - Main layer active during normal typing
+;; ============================================================================
+
+(deflayer base
+  @escctrl        ;; Caps Lock → Escape/Control
+  @toNav @toNav   ;; Physical Super keys → Switch to nav layer
+  @a  @s  @d  @f  ;; Left home row mods
+  h   @j  @k  @l  ;; Right home row mods (h is just 'h' in base layer)
+  @;  @.          ;; Semicolon and period
+  e   r           ;; E and R keys (normal in base)
+  i   u           ;; I and U keys (normal in base)
+  o   p   [       ;; O, P, and [ keys (normal in base)
+  c               ;; C key (normal in base)
+  _   _           ;; Physical Shift keys DISABLED
+  _   _           ;; Physical Alt keys DISABLED
+  _   _           ;; Physical Ctrl keys DISABLED
+)
+
+;; ============================================================================
+;; NAVIGATION LAYER - Vim-style arrow keys on h/j/k/l
+;; ============================================================================
+;; Press physical Super key to switch here, press again to go to accents layer
+
+(deflayer nav
+  @escctrl        ;; Caps Lock still works as Esc/Control
+  @toAccents @toAccents ;; Physical Super keys → Switch to accents layer
+  @a  @s  @d  @f  ;; Home row mods still work!
+  left down up rght ;; h/j/k/l become arrow keys (Vim-style!)
+  @;  @.          ;; Semicolon and period
+  e   r           ;; E and R keys (normal in nav)
+  i   u           ;; I and U keys (normal in nav)
+  o   p   [       ;; O, P, and [ keys (normal in nav)
+  c               ;; C key (normal in nav)
+  _   _           ;; Physical Shift keys DISABLED
+  _   _           ;; Physical Alt keys DISABLED
+  _   _           ;; Physical Ctrl keys DISABLED
+)
+
+;; ============================================================================
+;; ACCENTS LAYER - Portuguese accented characters
+;; ============================================================================
+;; Press physical Super key to switch back to base layer (completes the cycle)
+
+(deflayer accents
+  @escctrl        ;; Caps Lock still works as Esc/Control
+  @toBase @toBase ;; Physical Super keys → Switch back to base (cycle complete!)
+  @á  @ã  @â  @à  ;; A/S/D/F → á/ã/â/à (agudo/til/circunflexo/grave)
+  h   @j  @k  @l  ;; Right home row mods preserved! (h is normal 'h')
+  @;  @.          ;; Semicolon and period
+  @é  @ê          ;; E/R → é/ê (agudo/circunflexo)
+  @í  @ú          ;; I/U → í/ú (agudo)
+  @ó  @õ  @ô      ;; O/P/[ → ó/õ/ô (agudo/til/circunflexo)
+  @ç              ;; C → ç (cedilha)
+  _   _           ;; Physical Shift keys DISABLED
+  _   _           ;; Physical Alt keys DISABLED
+  _   _           ;; Physical Ctrl keys DISABLED
+)
+
+;; ============================================================================
+;; ALIASES - Define special key behaviors
+;; ============================================================================
+
+(defalias
+  ;; -------------------------------------------------------------------------
+  ;; Layer Switching - Tap to permanently switch layers (3-layer cycle)
+  ;; -------------------------------------------------------------------------
+  ;; Physical Super keys (lmet/rmet) now cycle between layers
+  ;; This frees up your Super keys since F and J act as Super via home row mods
+  ;; Cycle: base → nav → accents → base → ...
+  toNav (layer-switch nav)       ;; Switch to navigation layer
+  toAccents (layer-switch accents) ;; Switch to accents layer
+  toBase (layer-switch base)     ;; Switch back to base layer
+
+  ;; -------------------------------------------------------------------------
+  ;; Caps Lock: Tap for Escape, Hold to toggle Caps Lock
+  ;; -------------------------------------------------------------------------
+  ;; Perfect for Vim users! Quick tap gives Esc, hold toggles Caps Lock on/off
+  escctrl (tap-hold 100 100 esc caps)
+
+  ;; -------------------------------------------------------------------------
+  ;; LEFT HAND - Home Row Mods (GACS layout)
+  ;; -------------------------------------------------------------------------
+
+  ;; 'A' key - Left Alt modifier
+  ;; - Tap: types 'a'
+  ;; - Hold: Left Alt
+  a (tap-hold $tap-time $hold-time a lalt)
+
+  ;; 'S' key - Shift modifier
+  ;; - Tap: types 's'
+  ;; - Hold: Left Shift
+  s (tap-hold $tap-time $hold-time s lsft)
+
+  ;; 'D' key - Control modifier
+  ;; - Tap: types 'd'
+  ;; - Hold: Left Control
+  d (tap-hold $tap-time $hold-time d lctl)
+
+  ;; 'F' key - Super/Meta modifier (Windows/Command key)
+  ;; - Tap: types 'f'
+  ;; - Hold: Left Super (for Hyprland shortcuts!)
+  f (tap-hold $tap-time $hold-time f lmet)
+
+  ;; -------------------------------------------------------------------------
+  ;; RIGHT HAND - Home Row Mods (mirrored)
+  ;; -------------------------------------------------------------------------
+
+  ;; 'J' key - Super/Meta modifier
+  ;; - Tap: types 'j'
+  ;; - Hold: Right Super
+  j (tap-hold $tap-time $hold-time j rmet)
+
+  ;; 'K' key - Control modifier
+  ;; - Tap: types 'k'
+  ;; - Hold: Right Control
+  k (tap-hold $tap-time $hold-time k rctl)
+
+  ;; 'L' key - Shift modifier
+  ;; - Tap: types 'l'
+  ;; - Hold: Right Shift
+  l (tap-hold $tap-time $hold-time l rsft)
+
+  ;; ';' key - Left Alt modifier
+  ;; - Tap: types ';'
+  ;; - Hold: Left Alt
+  ; (tap-hold $tap-time $hold-time ; lalt)
+
+  ;; '.' key - Right Alt modifier
+  ;; - Tap: types '.'
+  ;; - Hold: Right Alt
+  . (tap-hold $tap-time $hold-time . ralt)
+
+  ;; -------------------------------------------------------------------------
+  ;; Portuguese Accented Characters - Unicode with Shift Support
+  ;; -------------------------------------------------------------------------
+  ;; Lowercase variants
+  á-low (unicode á)
+  é-low (unicode é)
+  í-low (unicode í)
+  ó-low (unicode ó)
+  ú-low (unicode ú)
+  ã-low (unicode ã)
+  õ-low (unicode õ)
+  â-low (unicode â)
+  ê-low (unicode ê)
+  ô-low (unicode ô)
+  à-low (unicode à)
+  ç-low (unicode ç)
+
+  ;; Uppercase variants
+  Á-up (unicode Á)
+  É-up (unicode É)
+  Í-up (unicode Í)
+  Ó-up (unicode Ó)
+  Ú-up (unicode Ú)
+  Ã-up (unicode Ã)
+  Õ-up (unicode Õ)
+  Â-up (unicode Â)
+  Ê-up (unicode Ê)
+  Ô-up (unicode Ô)
+  À-up (unicode À)
+  Ç-up (unicode Ç)
+
+  ;; Shift-aware aliases using fork (checks left or right Shift)
+  á (fork @á-low @Á-up (lsft rsft))
+  é (fork @é-low @É-up (lsft rsft))
+  í (fork @í-low @Í-up (lsft rsft))
+  ó (fork @ó-low @Ó-up (lsft rsft))
+  ú (fork @ú-low @Ú-up (lsft rsft))
+  ã (fork @ã-low @Ã-up (lsft rsft))
+  õ (fork @õ-low @Õ-up (lsft rsft))
+  â (fork @â-low @Â-up (lsft rsft))
+  ê (fork @ê-low @Ê-up (lsft rsft))
+  ô (fork @ô-low @Ô-up (lsft rsft))
+  à (fork @à-low @À-up (lsft rsft))
+  ç (fork @ç-low @Ç-up (lsft rsft))
+)
+
+;; ============================================================================
+;; USAGE EXAMPLES
+;; ============================================================================
+;;
+;; Layer Cycling with Physical Super Key:
+;; ---------------------------------------
+;; The physical Super keys (left/right Windows keys) cycle through 3 layers:
+;;
+;;   base → nav → accents → base → nav → accents → ...
+;;
+;; 1. Tap Super ONCE (from base):
+;;    → Enters navigation layer (Vim arrow keys)
+;;
+;; 2. Tap Super TWICE (from base):
+;;    → Enters accents layer (Portuguese accented characters)
+;;
+;; 3. Tap Super THREE TIMES (from base):
+;;    → Returns to base layer (cycle completes!)
+;;
+;;
+;; Navigation Layer (Vim Arrow Keys):
+;; -----------------------------------
+;; When in nav layer (tap Super once from base):
+;;
+;; Vim-style navigation on home row:
+;;   → 'H' = Left arrow ←
+;;   → 'J' = Down arrow ↓
+;;   → 'K' = Up arrow ↑
+;;   → 'L' = Right arrow →
+;;
+;; Home row mods still work in nav layer!
+;;   → Hold 'D' + tap 'L' = Ctrl+Right (jump word in terminal)
+;;   → Hold 'S' + tap 'K' = Shift+Up (select line up)
+;;   → Hold 'F' + tap 'H' = Super+Left (move window left in Hyprland)
+;;
+;; To go to accents layer:
+;;   → Tap physical Super key again
+;;
+;; To return to base layer:
+;;   → Tap physical Super key twice more (nav → accents → base)
+;;
+;;
+;; Accents Layer (Portuguese Characters):
+;; ---------------------------------------
+;; When in accents layer (tap Super twice from base):
+;;
+;; Vowel E:
+;;   → 'E' = é (agudo)
+;;   → 'R' = ê (circunflexo)
+;;
+;; Vowel I:
+;;   → 'I' = í (agudo)
+;;
+;; Vowel U:
+;;   → 'U' = ú (agudo)
+;;
+;; Vowel O:
+;;   → 'O' = ó (agudo)
+;;   → 'P' = õ (til)
+;;   → '[' = ô (circunflexo)
+;;
+;; Vowel A:
+;;   → 'A' = á (agudo)
+;;   → 'S' = ã (til)
+;;   → 'D' = â (circunflexo)
+;;   → 'F' = à (grave)
+;;
+;; Cedilha:
+;;   → 'C' = ç
+;;
+;; RIGHT HOME ROW MODS PRESERVED IN ACCENTS LAYER!
+;;   → Hold 'L' (Shift) + tap accent = UPPERCASE accent
+;;   → Example: Hold 'L' + tap 'A' = Á (capital A with acute)
+;;   → Example: Hold 'L' + tap 'C' = Ç (capital cedilla)
+;;   → Hold 'K' (Ctrl) + tap 'C' = Ctrl+ç (works in text editors!)
+;;
+;; Type "José":
+;;   1. Tap Super twice (enter accents layer)
+;;   2. Hold 'L' (Shift) + tap 'J'  → J
+;;   3. Tap 'O' → ó
+;;   4. Tap 'S' (wait, this is ã now!)
+;;   → Oops! Need to return to base for regular 's'
+;;   5. Better approach: Type "Jos" in base, then Super twice, tap 'E' for é
+;;
+;; Type "não":
+;;   1. Type "n" in base layer
+;;   2. Tap Super twice (enter accents layer)
+;;   3. Tap 'S' → ã
+;;   4. Tap Super (return to base)
+;;   5. Type "o" → não
+;;
+;; To return to base layer:
+;;   → Tap physical Super key once (accents → base)
+;;
+;; IMPORTANT: Accents layer works in TERMINALS!
+;; Unlike multitapping/tap-dance, layer switching works perfectly in
+;; terminal emulators on Wayland because it doesn't rely on timing detection.
+;;
+;;
+;; Home Row Mods Examples:
+;; -----------------------
+;; Super+T (e.g., open terminal in Hyprland):
+;;   → Hold 'F' + tap 'T'
+;;
+;; Ctrl+C (copy):
+;;   → Hold 'D' + tap 'C'
+;;
+;; Alt+Tab (switch windows):
+;;   → Hold 'A' + tap 'Tab'
+;;
+;; Shift+A (capital A):
+;;   → Hold 'S' + tap 'A'
+;;
+;; Ctrl+Shift+Esc (task manager):
+;;   → Hold 'D' + Hold 'S' + tap 'Esc'
+;;
+;;
+;; Portuguese Accents via Compose Key (DEPRECATED - Use Accents Layer Instead):
+;; -----------------------------------------------------------------------------
+;; NOTE: The 'A' key still acts as Compose/RightAlt when held, but the new
+;; accents layer (tap Super twice) is MUCH faster and works better in terminals!
+;;
+;; If you still want to use compose sequences:
+;;
+;; Acute accent (´) - Compose + ' + vowel:
+;;   → Hold 'A' + tap ' + release both, then tap vowel
+;;   → Examples: á, é, í, ó, ú
+;;
+;; Circumflex (^) - Compose + 6 + vowel:
+;;   → Hold 'A' + tap 6 + release both, then tap vowel (a, e, o only)
+;;   → Examples: â, ê, ô
+;;
+;; Tilde (~) - Compose + ~ + vowel:
+;;   → Hold 'A' + tap ~ + release both, then tap vowel (a, o only)
+;;   → Examples: ã, õ
+;;
+;; Grave accent (`) - Compose + ` + a:
+;;   → Hold 'A' + tap ` + release both, then tap 'a'
+;;   → Example: à
+;;
+;; Cedilla (ç) - Compose + ' + c:
+;;   → Hold 'A' + tap ' + release both, then tap 'c'
+;;
+;;
+;; Caps Lock / Escape / Toggle:
+;; ----------------------------
+;; Exit Vim insert mode:
+;;   → Quick tap on Caps Lock (sends Esc)
+;;
+;; Toggle Caps Lock on/off:
+;;   → Hold Caps Lock (activates/deactivates Caps Lock)
+;;   → Useful when you need to TYPE IN ALL CAPS
+;;
+;; ============================================================================
+;; CUSTOMIZATION TIPS
+;; ============================================================================
+;;
+;; 1. Adjust timing for your typing speed:
+;;    - If you get accidental modifiers → increase $hold-time (try 250)
+;;    - If modifiers feel slow → decrease $hold-time (try 180)
+;;
+;; 2. Find your keyboard device:
+;;    ls -l /dev/input/by-path/ | grep kbd
+;;    Update the 'linux-dev' line in defcfg
+;;
+;; 3. Validate config for syntax errors:
+;;    sudo kanata --cfg /etc/kanata/kanata.kbd --check
+;;
+;; 4. Test before enabling systemd service:
+;;    sudo kanata --cfg /etc/kanata/kanata.kbd
+;;    (Press Ctrl+C to stop)
+;;
+;; 5. Customize compose sequences:
+;;    The compose key uses system-wide compose definitions
+;;    You can customize these in ~/.XCompose or system compose tables
+;;
+;; 6. Add more layers:
+;;    You can extend this config with navigation, symbol, or number layers
+;;    See: https://github.com/jtroo/kanata/tree/main/cfg_samples
+;;
+;; ============================================================================
+;; TROUBLESHOOTING
+;; ============================================================================
+;;
+;; Problem: Kanata won't start
+;; Solution: Check device path and logs (sudo journalctl -u kanata.service -f)
+;;
+;; Problem: Too many accidental modifiers when typing fast
+;; Solution: Increase $hold-time from 200 to 250 or 300
+;;
+;; Problem: Compose sequences don't work (accents don't appear)
+;; Solution: Make sure your system has compose key support enabled
+;;           The 'comp' key in Kanata uses system-wide compose definitions
+;;           Test: Hold 'A' + tap apostrophe ('), release, then tap 'e' → should get 'é'
+;;           If nothing happens, your system may need compose key configuration
+;;
+;; Problem: Accents work in GUI apps but not in terminal
+;; Solution: This is expected! Compose key works reliably in terminals
+;;           Unlike tap-dance/unicode which often fails in terminals
+;;
+;; Problem: Some keys aren't working
+;; Solution: This config only remaps specific keys. All other keys pass through
+;;           unchanged. Check that process-unmapped-keys is set to 'yes'
+;;
+;; ============================================================================
+
+;; End of configuration
+;; For more information: https://github.com/jtroo/kanata

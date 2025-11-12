@@ -18,10 +18,21 @@ The `hyprland.conf` rules will handle:
 - Making the window float
 - Setting it to fullscreen
 - Removing borders and shadows
+- Disabling blur effects (for performance)
 - Setting opacity (e.g., 0.8)
 
+Example windowrules:
+```hyprlang
+windowrulev2 = float, initialTitle:^(HyprGrid)$
+windowrulev2 = fullscreen, initialTitle:^(HyprGrid)$
+windowrulev2 = noborder, initialTitle:^(HyprGrid)$
+windowrulev2 = noshadow, initialTitle:^(HyprGrid)$
+windowrulev2 = noblur, initialTitle:^(HyprGrid)$
+windowrulev2 = opacity 0.8, initialTitle:^(HyprGrid)$
+```
+
 Your application just needs to:
-- Set the initial title correctly
+- Set the initial title correctly ("HyprGrid")
 - Request fullscreen size
 - Be prepared to receive those properties
 

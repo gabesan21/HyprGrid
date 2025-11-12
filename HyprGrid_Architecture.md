@@ -54,7 +54,7 @@ To open a portal to the Grid, you must encode these instructions into your `hypr
 
     # 1. Keybind to summon HyprGrid
     # This assumes the compiled binary is named 'hyprgrid' and is in ~/.config/hypr/
-    bind = $mainMod, S, exec, ~/.config/hypr/hyprgrid
+    bind = $mainMod CTRL, G, exec, ~/.config/hypr/hyprgrid
 
     # 2. Window Rules to make the Grid a proper overlay
     # We assign the window an initialTitle of "HyprGrid" to target it.
@@ -62,6 +62,7 @@ To open a portal to the Grid, you must encode these instructions into your `hypr
     windowrulev2 = fullscreen, initialTitle:^(HyprGrid)$
     windowrulev2 = noborder, initialTitle:^(HyprGrid)$
     windowrulev2 = noshadow, initialTitle:^(HyprGrid)$
+    windowrulev2 = noblur, initialTitle:^(HyprGrid)$
     windowrulev2 = opacity 0.8, initialTitle:^(HyprGrid)$
     ```
 

@@ -2,6 +2,7 @@ mod config;
 mod grid;
 
 use config::{get_active_monitor, GridDimensions, HyprGridConfig};
+use grid::Grid;
 
 fn main() {
     println!("HyprGrid: Initializing...");
@@ -38,6 +39,14 @@ fn main() {
         &active_monitor,
     );
 
+    // Generate the complete grid with all cells and coordinates
+    let grid = Grid::new(
+        grid_dims.rows,
+        grid_dims.cols,
+        active_monitor.width,
+        active_monitor.height,
+    );
+
     // Display configuration report
     println!("Configuration loaded successfully!");
     println!();
@@ -54,6 +63,37 @@ fn main() {
     if grid_dims.orientation.as_str() == "Portrait" {
         println!();
         println!("  Note: Grid dimensions auto-rotated for portrait orientation");
+    }
+
+    println!();
+    println!("Border Settings:");
+    println!("  Enabled:  {}", config.border_enabled);
+    println!("  Color:    {}", config.border_color);
+    println!("  Width:    {} px", config.border_width);
+
+    println!();
+    println!("Grid Calculations:");
+    println!("  Cell width:   {} px", active_monitor.width / grid.cols);
+    println!("  Cell height:  {} px", active_monitor.height / grid.rows);
+    println!("  Total cells:  {}", grid.total_cells());
+
+    // Show a sample of cell labels and their coordinates
+    println!();
+    println!("Sample Cell Coordinates:");
+    if let Some(cell) = grid.get_cell("aa") {
+        let (cx, cy) = cell.coordinates.center();
+        println!("  Cell 'aa': position ({}, {}), center at ({}, {})",
+                 cell.coordinates.x, cell.coordinates.y, cx, cy);
+    }
+    if let Some(cell) = grid.get_cell("as") {
+        let (cx, cy) = cell.coordinates.center();
+        println!("  Cell 'as': position ({}, {}), center at ({}, {})",
+                 cell.coordinates.x, cell.coordinates.y, cx, cy);
+    }
+    if let Some(cell) = grid.get_cell("ad") {
+        let (cx, cy) = cell.coordinates.center();
+        println!("  Cell 'ad': position ({}, {}), center at ({}, {})",
+                 cell.coordinates.x, cell.coordinates.y, cx, cy);
     }
 
     println!();

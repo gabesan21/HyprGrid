@@ -103,6 +103,27 @@ pub struct HyprGridConfig {
     pub grid_rows: u32,
     /// Number of columns in the grid overlay (for landscape orientation)
     pub grid_cols: u32,
+    /// Whether to draw borders between grid cells
+    #[serde(default = "default_border_enabled")]
+    pub border_enabled: bool,
+    /// Color of the grid cell borders (hex format)
+    #[serde(default = "default_border_color")]
+    pub border_color: String,
+    /// Width of the grid cell borders in pixels
+    #[serde(default = "default_border_width")]
+    pub border_width: u32,
+}
+
+fn default_border_enabled() -> bool {
+    true
+}
+
+fn default_border_color() -> String {
+    "#FFFFFF".to_string()
+}
+
+fn default_border_width() -> u32 {
+    1
 }
 
 impl HyprGridConfig {
@@ -144,7 +165,10 @@ impl HyprGridConfig {
                      Please check that the TOML syntax is valid.\n\
                      Example format:\n\
                      grid_rows = 10\n\
-                     grid_cols = 20",
+                     grid_cols = 20\n\
+                     border_enabled = true\n\
+                     border_color = \"#FFFFFF\"\n\
+                     border_width = 1",
                     config_path.display()
                 )
             })?;
@@ -172,6 +196,8 @@ impl HyprGridConfig {
     ///
     /// Ensures that:
     /// - Grid dimensions are within reasonable bounds (2-50)
+    /// - Border width is reasonable (0-10 pixels)
+    /// - Border color is valid hex format
     fn validate(&self) -> Result<()> {
         // Validate grid dimensions
         if self.grid_rows < 2 || self.grid_rows > 50 {
@@ -187,6 +213,24 @@ impl HyprGridConfig {
                 "Invalid grid_cols: {}. Must be between 2 and 50.\n\
                  A reasonable value would be between 10 and 30.",
                 self.grid_cols
+            ));
+        }
+
+        // Validate border width
+        if self.border_width > 10 {
+            return Err(anyhow!(
+                "Invalid border_width: {}. Must be between 0 and 10 pixels.\n\
+                 A reasonable value would be 1-3 pixels.",
+                self.border_width
+            ));
+        }
+
+        // Validate border color format (basic check for hex color)
+        if !self.border_color.starts_with('#') ||
+           (self.border_color.len() != 7 && self.border_color.len() != 4) {
+            return Err(anyhow!(
+                "Invalid border_color: '{}'. Must be a hex color (e.g., #FFFFFF or #FFF).",
+                self.border_color
             ));
         }
 
